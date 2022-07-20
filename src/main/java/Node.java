@@ -22,6 +22,7 @@ public class Node implements Runnable{
     String nodeName = "Node";
     int maxHops = 3;
     String portfileName = "Port";
+    int myPort;
     InetAddress hostAddress;
     DatagramPacket dp;
     HashMap<String, File> filesToStore = new HashMap<String, File>();
@@ -43,6 +44,7 @@ public class Node implements Runnable{
 
         }
     }
+    static Logger log = Logger.getLogger(Node.class.getName());
 
     public static void main(String args[]) throws Exception {
 
@@ -135,6 +137,8 @@ public class Node implements Runnable{
 
         HashMap<String, File> films = new HashMap<String, File>();
 
+        log.info("Set RANDOM FILES");
+
         films.put("Harry_Potter", new File("D:\\Films\\Lord_of_the_Rings.mov"));
         films.put("The_Seven_Samurai", new File("D:\\Films\\Harry_Porter_1.mov"));
         films.put("Fast_and_Furious", new File("D:\\Films\\Fast_and_Furious.mov"));
@@ -152,13 +156,14 @@ public class Node implements Runnable{
         ArrayList<String> keysAsArray = new ArrayList<String>(films.keySet());
         for (int fileIndex : randomIndices) {
             filesToStore.put(keysAsArray.get(fileIndex), films.get(keysAsArray.get(fileIndex)));
-            System.out.println(keysAsArray.get(fileIndex));
+            log.info("File Added: " + keysAsArray.get(fileIndex));
         }
 
     }
 
     public void initializeSocket(int port) { // initiating the listening for the port
         echo("listening to " + port);
+        this.myPort = port;
         try {
             node2 = new DatagramSocket(port);
         } catch (Exception e) {
@@ -197,26 +202,29 @@ public class Node implements Runnable{
                 if (command.equals("JOIN")) {
                     String neighbour_ip = st.nextToken();
                     String neighbour_port =  st.nextToken();
-                    System.out.println("###### MY PORT" + port + " ######## MY IP " + ip_address);
-                    System.out.println("Joining Neighbour Port " + neighbour_port + " Joining Neighbor IP " + neighbour_ip);
+                    log.info("###### MY PORT " + myPort + " ######## MY IP " + ip_address);
+                    log.info("Joining Neighbour Port " + incoming.getPort() + " Joining Neighbor IP " +  incoming.getAddress().getHostAddress());
                     String reply = " JOINOK "+ip_address+" "+ nodePort;
                     reply = "00" + (reply.length() + 2) + reply;
                     System.out.println("Sending the Join OK" );
-                    sendMessage(reply, neighbour_ip, neighbour_port);
-                    System.out.println("Sending the Join OK" );
-                    Neighbour tempNeighbour = new Neighbour(neighbour_ip,Integer.parseInt(neighbour_port), "neighbour");
-                    joinedNodes.add(tempNeighbour);
+                    sendMessage(reply, incoming.getAddress().getHostAddress(), String.valueOf(incoming.getPort()));
+                    Neighbour tempNeighbour = new Neighbour(incoming.getAddress().getHostAddress(),incoming.getPort(), "neighbour");
+                    if (neighbour_port.equals(String.valueOf(myPort)) ) {
+                        joinedNodes.add(tempNeighbour);
+                    }
                     System.out.println("Number of Joined Nodes: " + joinedNodes.size());
 
                 } else if (command.equals("JOINOK")) {
                     System.out.println("JOIN OK Received ");
                     String neighbour_ip = st.nextToken();
                     String neighbour_port =  st.nextToken();
-                    System.out.println("###### MY PORT" + port + " ######## MY IP " + ip_address);
+                    System.out.println("###### MY PORT " + myPort + " ######## MY IP " + ip_address);
                     System.out.println("Joined Neighbour Port " + neighbour_port + " Joined Neighbor IP " + neighbour_ip);
 
                     Neighbour tempNeighbour = new Neighbour(neighbour_ip, Integer.parseInt(neighbour_port), "neighbour");
-                    joinedNodes.add(tempNeighbour);
+                    if (neighbour_port.equals(String.valueOf(myPort)) ) {
+                        joinedNodes.add(tempNeighbour);
+                    }
                     echo(Integer.toString(joinedNodes.size()));
                     System.out.println("Number of Joined Nodes: " + joinedNodes.size());
                 } else if (command.equals("hbt")) {
@@ -232,10 +240,11 @@ public class Node implements Runnable{
                 } else if (command.equals("hbtok")) {
 
                 } else if (command.equals("SER")) {
-
                     String originatorIP = st.nextToken();
                     int originatorPort = Integer.parseInt(st.nextToken());
                     String searchFile = st.nextToken();
+                    System.out.println("###### MY PORT " + port + " ######## MY IP " + ip_address);
+                    System.out.println("### Search request came for the file: " + searchFile + " From the port: " + originatorPort + " From the IP: " + originatorIP);
                     int hops = Integer.parseInt(st.nextToken());
                     System.out.println("SER " + originatorIP + " " + searchFile + " " + hops);
 
@@ -331,8 +340,12 @@ public class Node implements Runnable{
                             String join_msg = "00" + (join.length() + 4) + join;
 
                             sendJoinReq(join_msg, join_ip, Integer.parseInt(join_port));
+                            Neighbour tempNeighbour = new Neighbour(join_ip, Integer.parseInt(join_port), "neighbour");
+                            joinedNodes.add(tempNeighbour);
                             no_nodes -= 1;
                         }
+
+                        System.out.println("Number of Joined Nodes: " + joinedNodes.size());
                     }
 
                 }
@@ -437,6 +450,7 @@ public class Node implements Runnable{
 
                 } else if (outMessage.contains("ser")) {
                     String searchQuery = outMessage.split(" ")[1];
+                    log.info("Command Line search command made for the file: " + outMessage);
 
                     int totalResults = 0;
                     ArrayList<String> searchResults = new ArrayList<String>();
@@ -449,7 +463,7 @@ public class Node implements Runnable{
                     }
                     if(totalResults == 0) {
                         //select random node from neighbours
-                        System.out.println("############ No results were found from my node looking in neighbour nodes");
+                        log.info("############ No results were found from my node looking in neighbour nodes");
                         Random r = new Random();
                         Neighbour randomSuccessor = joinedNodes.get(r.nextInt(joinedNodes.size()));
 
