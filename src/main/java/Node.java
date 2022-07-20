@@ -325,8 +325,12 @@ public class Node implements Runnable{
                             String join_msg = "00" + (join.length() + 4) + join;
 
                             sendJoinReq(join_msg, join_ip, Integer.parseInt(join_port));
+                            Neighbour tempNeighbour = new Neighbour(join_ip, Integer.parseInt(join_port), "neighbour");
+                            joinedNodes.add(tempNeighbour);
                             no_nodes -= 1;
                         }
+
+                        System.out.println("Number of Joined Nodes: " + joinedNodes.size());
                     }
 
                 }
