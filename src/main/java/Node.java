@@ -195,18 +195,28 @@ public class Node implements Runnable{
                 if (command.equals("JOIN")) {
                     String neighbour_ip = st.nextToken();
                     String neighbour_port =  st.nextToken();
+                    System.out.println("###### MY PORT" + port + " ######## MY IP " + ip_address);
+                    System.out.println("Joining Neighbour Port " + neighbour_port + " Joining Neighbor IP " + neighbour_ip);
                     String reply = " JOINOK "+ip_address+" "+ nodePort;
                     reply = "00" + (reply.length() + 2) + reply;
-                    sendMessage(reply, ip, neighbour_port);
-                    Neighbour tempNeighbour = new Neighbour(ip,Integer.parseInt(neighbour_port), "neighbour");
+                    System.out.println("Sending the Join OK" );
+                    sendMessage(reply, neighbour_ip, neighbour_port);
+                    System.out.println("Sending the Join OK" );
+                    Neighbour tempNeighbour = new Neighbour(neighbour_ip,Integer.parseInt(neighbour_port), "neighbour");
                     joinedNodes.add(tempNeighbour);
+                    System.out.println("Number of Joined Nodes: " + joinedNodes.size());
 
                 } else if (command.equals("JOINOK")) {
+                    System.out.println("JOIN OK Received ");
                     String neighbour_ip = st.nextToken();
                     String neighbour_port =  st.nextToken();
-                    Neighbour tempNeighbour = new Neighbour(ip, Integer.parseInt(neighbour_port), "neighbour");
+                    System.out.println("###### MY PORT" + port + " ######## MY IP " + ip_address);
+                    System.out.println("Joined Neighbour Port " + neighbour_port + " Joined Neighbor IP " + neighbour_ip);
+
+                    Neighbour tempNeighbour = new Neighbour(neighbour_ip, Integer.parseInt(neighbour_port), "neighbour");
                     joinedNodes.add(tempNeighbour);
                     echo(Integer.toString(joinedNodes.size()));
+                    System.out.println("Number of Joined Nodes: " + joinedNodes.size());
                 } else if (command.equals("hbt")) {
 
                     String originatorIP = st.nextToken();
