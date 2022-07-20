@@ -6,6 +6,8 @@ import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import static config.Constant.TCP_PORT;
+
 
 public class Node implements Runnable{
 
@@ -301,6 +303,7 @@ public class Node implements Runnable{
                     String respondedNodeIP = st.nextToken();
                     int respondedNodePort = Integer.parseInt(st.nextToken());
                     int hops = Integer.parseInt(st.nextToken());
+                    String matchingFile = "file.pdf"; //TODO: implement the real file name
 
                     System.out.println("Responded Node IP: " + respondedNodeIP);
                     System.out.println("Responded Node Port: " + respondedNodePort);
@@ -309,6 +312,9 @@ public class Node implements Runnable{
                     for (int i = 0; i < totalResults; i++) {
                         System.out.println(st.nextToken());
                     }
+
+                    Client client = new Client(respondedNodeIP, TCP_PORT);// TODO: TCP port or dynamic port?
+                    client.receiveFile(matchingFile);
                 } else if (command.equals("REGOK")) {
 
                     int no_nodes = Integer.parseInt(st.nextToken());
