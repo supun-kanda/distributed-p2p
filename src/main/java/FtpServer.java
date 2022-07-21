@@ -37,13 +37,12 @@ class Server {
 
 class ClientThread extends Thread {
     private DataInputStream dis;
-    private DataOutputStream dos;
+    private final Socket socket;
 
-    public ClientThread(Socket c) {
+    public ClientThread(Socket socket) {
+        this.socket = socket;
         try {
-            dis = new DataInputStream(c.getInputStream());
-            dos = new DataOutputStream(c.getOutputStream());
-
+            dis = new DataInputStream(socket.getInputStream());
         } catch (Exception e) {
             System.err.println("Error occurred while initiating: " + e);
         }
@@ -52,19 +51,26 @@ class ClientThread extends Thread {
     public void run() {
         while (true) {
             try {
+                if (dis.available() == 0) {
+                    continue;
+                }
                 String input = dis.readUTF();
 
                 if (input.equals("DOWNLOAD_FILE")) {
+                    DataOutputStream dos = new DataOutputStream(socket.getOutputStream());
+
                     String fileName = dis.readUTF();
                     System.out.println("Requesting to download: " + fileName);
                     File file = new File(FILE_STORE + fileName);
                     if (file.isFile()) {
+
                         byte[] mybytearray = new byte[(int) file.length()];
 
                         FileInputStream fis = new FileInputStream(file);
                         BufferedInputStream bis = new BufferedInputStream(fis);
                         DataInputStream dis = new DataInputStream(bis);
                         dis.readFully(mybytearray, 0, mybytearray.length);
+
 
                         dos.writeUTF(fileName); // write name
                         dos.writeLong(mybytearray.length); // write length
