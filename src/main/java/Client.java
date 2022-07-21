@@ -33,7 +33,8 @@ public class Client {
         }
     }
 
-    public void receiveFile(String fileName) {
+    public long receiveFile(String fileName) {
+        long beforeDownload = System.currentTimeMillis();
         try {
             int bytesRead;
             System.out.println("Downloading the file: " + fileName);
@@ -56,8 +57,11 @@ public class Client {
 
             output.close();
             serverData.close();
+            long afterDownload = System.currentTimeMillis();
+            return afterDownload - beforeDownload;
         } catch (Exception e) {
             System.err.println("Error while receiving the file: " + fileName + ": " + e);
+            return beforeDownload;
         }
     }
 
