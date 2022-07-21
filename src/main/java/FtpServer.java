@@ -14,16 +14,26 @@ import static config.Constant.TCP_PORT;
  * Date: 21/07/2022
  */
 class Server {
+    private final int port;
 
-    public static void main(String[] arg) {
-        Server s = new Server();
-        s.doConnections();
+    public Server() {
+        this.port = TCP_PORT;
     }
+
+    public Server(int port) {
+        this.port = port;
+    }
+
+//    public static void main(String[] arg) {
+//        Server s = new Server();
+//        s.doConnections();
+//    }
 
     public void doConnections() {
 
         try {
-            ServerSocket server = new ServerSocket(TCP_PORT);
+            ServerSocket server = new ServerSocket(port);
+            System.out.println("Server started on: " + port);
             while (true) {
                 Socket client = server.accept();
                 ClientThread ct = new ClientThread(client);

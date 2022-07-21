@@ -17,8 +17,12 @@ public class Client {
     private DataInputStream dis;
     private DataOutputStream dos;
     private BufferedReader br;
+    private String ip;
+    private int port;
 
     public Client(String ip, int port) {
+        this.ip = ip;
+        this.port = port;
         InputStreamReader isr = new InputStreamReader(System.in);
         try {
             Socket client = new Socket(ip, port);
@@ -55,5 +59,13 @@ public class Client {
         } catch (Exception e) {
             System.err.println("Error while receiving the file: " + fileName + ": " + e);
         }
+    }
+
+    @Override
+    public String toString() {
+        return "Client{" +
+                "ip='" + ip + '\'' +
+                ", port=" + port +
+                '}';
     }
 }

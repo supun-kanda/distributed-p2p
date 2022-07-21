@@ -1,12 +1,32 @@
-import java.io.*;
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.ObjectInput;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutput;
+import java.io.ObjectOutputStream;
+import java.io.OutputStream;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Random;
+import java.util.StringTokenizer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import static config.Constant.TCP_PORT;
+import static config.Constant.OFFSET;
 
 
 public class Node implements Runnable{
@@ -77,6 +97,13 @@ public class Node implements Runnable{
         stdReadThread.start();
         listnerThread.start();
         htbThread.start();
+
+
+        Server s = new Server(n1.getPort() + OFFSET);
+        s.doConnections();
+
+
+
     }
     public void setServer(String server) {
         server_ip = server;
@@ -175,6 +202,7 @@ public class Node implements Runnable{
         byte[] buffer = new byte[65536];
         DatagramPacket incoming = new DatagramPacket(buffer, buffer.length);
         initializeSocket(nodePort);
+
         while (true) {
 
             try {
@@ -312,17 +340,17 @@ public class Node implements Runnable{
                     String respondedNodeIP = st.nextToken();
                     int respondedNodePort = Integer.parseInt(st.nextToken());
                     int hops = Integer.parseInt(st.nextToken());
-                    String matchingFile = "file.pdf"; //TODO: implement the real file name
 
                     System.out.println("Responded Node IP: " + respondedNodeIP);
                     System.out.println("Responded Node Port: " + respondedNodePort);
                     System.out.println("Total No. of Results: " + totalResults);
                     System.out.println("No of Hops request went through: " + hops);
-                    Client client = new Client(respondedNodeIP, TCP_PORT);// TODO: TCP port or dynamic port?
+                    Client client = new Client(respondedNodeIP,
+                            respondedNodePort + OFFSET);
                     for (int i = 0; i < totalResults; i++) {
 
-                        matchingFile =st.nextToken();
-                        log.info("Following Matched File Will be downloaded: " +  matchingFile);
+                        String matchingFile = st.nextToken();
+                        log.info("Following Matched File Will be downloaded from destination: " + client + " file: " + matchingFile);
                         client.receiveFile(matchingFile);
                     }
 
