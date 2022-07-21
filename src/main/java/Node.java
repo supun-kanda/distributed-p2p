@@ -25,7 +25,6 @@ import java.util.Random;
 import java.util.StringTokenizer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import java.sql.Timestamp;
 
 import static config.Constant.OFFSET;
 
@@ -167,15 +166,17 @@ public class Node implements Runnable{
 
         log.info("Set RANDOM FILES");
 
-        films.put("Harry_Potter", new File("D:\\Films\\Lord_of_the_Rings.mov"));
-        films.put("The_Seven_Samurai", new File("D:\\Films\\Harry_Porter_1.mov"));
-        films.put("Fast_and_Furious", new File("D:\\Films\\Fast_and_Furious.mov"));
-        films.put("Bonnie_and_Clyde", new File("D:\\Films\\La_La_Land.mov"));
-        films.put("Pan's_Labyrinth", new File("D:\\Films\\Transformers.mov"));
-        films.put("Doctor_Zhivago", new File("D:\\Films\\Transformers.mov"));
-        films.put("Spider_Man_", new File("D:\\Films\\Spider_Man_1.mov"));
-        films.put("Reservoir_Dogs\n", new File("D:\\Films\\abc.mov"));
-        films.put("Airplane!", new File("D:\\Films\\Lord_of_the_Rings.mov"));
+        films.put("A.pdf", new File("D:\\Films\\Lord_of_the_Rings.mov"));
+        films.put("B.pdf", new File("D:\\Films\\Harry_Porter_1.mov"));
+        films.put("C.pdf", new File("D:\\Films\\Fast_and_Furious.mov"));
+        films.put("D.pdf", new File("D:\\Films\\La_La_Land.mov"));
+        films.put("E.pdf", new File("D:\\Films\\Transformers.mov"));
+        films.put("F.pdf", new File("D:\\Films\\Transformers.mov"));
+        films.put("G.pdf", new File("D:\\Films\\Transformers.mov"));
+        films.put("H.pdf", new File("D:\\Films\\Transformers.mov"));
+        films.put("I.pdf", new File("D:\\Films\\Transformers.mov"));
+        films.put("J.pdf", new File("D:\\Films\\Transformers.mov"));
+        films.put("K.pdf", new File("D:\\Films\\Transformers.mov"));
 
         //generate 3 random indices to pick files from hashmap
         int[] randomIndices = new Random().ints(1, films.size()).distinct().limit(3).toArray();
@@ -328,8 +329,8 @@ public class Node implements Runnable{
                                     break;
                                 }
                             }
-                            String searchCommand = " SER " + originatorIP + " " + originatorPort + " "+searchFile+" "
-                                    + --hops;
+                            String searchCommand = " SER " + originatorIP + " " + originatorPort + " " + searchFile + " "
+                                    + --hops + " " + initTimeStamp;
 
                             searchCommand = "00" + (searchCommand.length() + 4) + searchCommand;
                             sendMessage(searchCommand, randomSuccessor.getIp(),
