@@ -77,10 +77,10 @@ class ClientThread extends Thread {
                         System.err.println("No file found");
                     }
                 } else {
-                    System.out.println("Error at Server");
+                    System.out.println("Error at Server invalid input: " + input);
                 }
             } catch (Exception e) {
-                System.err.println("Error at Server");
+                System.err.println("Error at Server: " + e);
             }
         }
     }
