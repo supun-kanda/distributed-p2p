@@ -25,6 +25,7 @@ import java.util.Random;
 import java.util.StringTokenizer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.sql.Timestamp;
 
 import static config.Constant.OFFSET;
 
@@ -274,6 +275,7 @@ public class Node implements Runnable{
                     System.out.println("###### MY PORT " + port + " ######## MY IP " + ip_address);
                     System.out.println("### Search request came for the file: " + searchFile + " From the port: " + originatorPort + " From the IP: " + originatorIP);
                     int hops = Integer.parseInt(st.nextToken());
+                    long initTimeStamp = Long.parseLong(st.nextToken());
                     System.out.println("SER " + originatorIP + " " + searchFile + " " + hops);
 
                     if (hops < 0) {
@@ -296,9 +298,10 @@ public class Node implements Runnable{
                             }
                         }
                         if(totalResults > 0) {
+                            log.info("File found in neighbor node in: " + (System.currentTimeMillis() - initTimeStamp) + " ms");
                             --hops;
                             String searchResultOkCommand = " SEROK " + totalResults + " " + ip_address + " " + nodePort
-                                    + " " + (maxHops - hops);
+                                    + " " + (maxHops - hops) + " " + initTimeStamp;
                             for (String fileName : searchResults) {
                                 searchResultOkCommand += " " + fileName;
                             }
@@ -345,13 +348,18 @@ public class Node implements Runnable{
                     System.out.println("Responded Node Port: " + respondedNodePort);
                     System.out.println("Total No. of Results: " + totalResults);
                     System.out.println("No of Hops request went through: " + hops);
+                    long searchTime = Long.parseLong(st.nextToken());
+
+                    log.info("Total Search time: " + (System.currentTimeMillis() - searchTime) + " ms");
+
                     Client client = new Client(respondedNodeIP,
                             respondedNodePort + OFFSET);
                     for (int i = 0; i < totalResults; i++) {
 
                         String matchingFile = st.nextToken();
                         log.info("Following Matched File Will be downloaded from destination: " + client + " file: " + matchingFile);
-                        client.receiveFile(matchingFile);
+                        long diff = client.receiveFile(matchingFile);
+                        log.info("Total Time to download file : " + (System.currentTimeMillis() - searchTime + diff) + " ms");
                     }
 
 
@@ -468,6 +476,7 @@ public class Node implements Runnable{
     }
 
     public void getCommandLineOutput() {
+        long initTimeStamp;
         BufferedReader stdin = new BufferedReader(new InputStreamReader(System.in));
         while (true) {
             try {
@@ -481,6 +490,8 @@ public class Node implements Runnable{
                     sendMessage("test from n1", "127.0.1.1", "5001");
 
                 } else if (outMessage.contains("ser")) {
+                    initTimeStamp = System.currentTimeMillis();
+                    log.info("Search command made at Time Stamp: " + initTimeStamp);
                     String searchQuery = outMessage.split(" ")[1];
                     log.info("Command Line search command made for the file: " + outMessage);
 
@@ -500,10 +511,11 @@ public class Node implements Runnable{
                         Neighbour randomSuccessor = joinedNodes.get(r.nextInt(joinedNodes.size()));
 
                         //send search message to picked neighbour
-                        String searchCommand = " SER " + ip_address + " " + nodePort + " " + searchQuery + " " + maxHops;
+                        String searchCommand = " SER " + ip_address + " " + nodePort + " " + searchQuery + " " + maxHops + " " + initTimeStamp;
                         searchCommand = "00" + (searchCommand.length() + 4) + searchCommand;
                         sendMessage(searchCommand, randomSuccessor.getIp(), String.valueOf(randomSuccessor.getPort()));
                     } else {
+                        log.info("Found the file in: " + (System.currentTimeMillis() - initTimeStamp) + " ms");
                         System.out.println("########### File found in my node");
                     }
 
