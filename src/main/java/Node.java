@@ -318,12 +318,16 @@ public class Node implements Runnable{
                     System.out.println("Responded Node Port: " + respondedNodePort);
                     System.out.println("Total No. of Results: " + totalResults);
                     System.out.println("No of Hops request went through: " + hops);
+                    Client client = new Client(respondedNodeIP, TCP_PORT);// TODO: TCP port or dynamic port?
                     for (int i = 0; i < totalResults; i++) {
-                        System.out.println(st.nextToken());
+
+                        matchingFile =st.nextToken();
+                        log.info("Following Matched File Will be downloaded: " +  matchingFile);
+                        client.receiveFile(matchingFile);
                     }
 
-                    Client client = new Client(respondedNodeIP, TCP_PORT);// TODO: TCP port or dynamic port?
-                    client.receiveFile(matchingFile);
+
+
                 } else if (command.equals("REGOK")) {
 
                     int no_nodes = Integer.parseInt(st.nextToken());
