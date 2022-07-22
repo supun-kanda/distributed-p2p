@@ -1,0 +1,56 @@
+8 Nodes Running,,
+,,
+Query,Hops,Latency
+,,
+ser Twilight,4,33
+ser Jack,1,16
+ser American_Idol,1,54
+ser Happy_Feet,3,34
+ser Happy_Feet,2,67
+ser Feet,1,58
+ser Happy_Feet,2,35
+ser Twilight,1,85
+ser Windows,1,128
+ser Happy_Feet,3,98
+ser Mission_Impossible,3,56
+ser Twilight,1,101
+ser Windows_8,1,292
+ser The,1,75
+ser Happy,2,85
+ser Windows_8,4,248
+ser Happy_Feet,0,3
+ser Jack_and_Jill,2,100
+ser Happy_Feet,4,160
+ser Impossible,4,206
+,,
+7 Nodes Running,,
+,,
+ser Happy_Feet,1,255
+ser Turn_Up_The_Music,0,11
+ser Adventures_of_Tintin,2,117
+ser Happy_Feet,1,271
+ser Super_Mario,0,1
+ser American_Pickers,1,129
+ser Microsoft_Office_2010,4,174
+ser Twilight,2,298
+ser Modern_Family,2,255
+ser Jack_and_Jill,2,83
+ser Jill,2,217
+ser Glee,0,2
+ser The_Vampire_Diarie,1,171
+ser King_Arthur,0,9
+ser Jack_and_Jill,1,259
+ser King_Arthur,4,360
+,,
+6 Nodes Running,,
+,,
+ser Windows_XP,1,208
+ser Harry_Potter,1,408
+ser Feet,4,188
+ser Kung_Fu_Panda,1,211
+ser Lady_Gaga,2,224
+ser Gaga,2,336
+ser Happy_Feet,0,1
+ser Twilight,1,221
+ser Hacking,1,252
+ser King,0,0
