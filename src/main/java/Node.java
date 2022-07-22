@@ -161,33 +161,49 @@ public class Node implements Runnable{
 
     //Randomly pick two files from the file list.
     public void setFiles() {
-
-        HashMap<String, File> films = new HashMap<String, File>();
-
         log.info("Set RANDOM FILES");
+        Random rng = new Random();
+        int min = 0;
+        int max = 3;
+        int upperBound = max - min + 1; // upper
+        int group = min + rng.nextInt(upperBound);
+        log.info("@@@ GROUP @@@: " + group);
+        switch (group) {
+            case 0:
+                filesToStore.put("Adventures_of_Tintin.pdf", new File(""));
+                filesToStore.put("Jack_and_Jill.pdf", new File(""));
+                filesToStore.put("Glee.pdf", new File(""));
+                filesToStore.put("The_Vampire_Diarie.pdf", new File(""));
+                filesToStore.put("King_Arthur.pdf", new File(""));
+                break;
+            case 1:
+                filesToStore.put("Windows_XP.pdf", new File(""));
+                filesToStore.put("Harry_Potter.pdf", new File(""));
+                filesToStore.put("Kung_Fu_Panda.pdf", new File(""));
+                filesToStore.put("Lady_Gaga.pdf", new File(""));
+                filesToStore.put("Twilight.pdf", new File(""));
+                break;
 
-        films.put("A.pdf", new File("D:\\Films\\Lord_of_the_Rings.mov"));
-        films.put("B.pdf", new File("D:\\Films\\Harry_Porter_1.mov"));
-        films.put("C.pdf", new File("D:\\Films\\Fast_and_Furious.mov"));
-        films.put("D.pdf", new File("D:\\Films\\La_La_Land.mov"));
-        films.put("E.pdf", new File("D:\\Films\\Transformers.mov"));
-        films.put("F.pdf", new File("D:\\Films\\Transformers.mov"));
-        films.put("G.pdf", new File("D:\\Films\\Transformers.mov"));
-        films.put("H.pdf", new File("D:\\Films\\Transformers.mov"));
-        films.put("I.pdf", new File("D:\\Films\\Transformers.mov"));
-        films.put("J.pdf", new File("D:\\Films\\Transformers.mov"));
-        films.put("K.pdf", new File("D:\\Films\\Transformers.mov"));
+            case 2:
+                filesToStore.put("Windows_8.pdf", new File(""));
+                filesToStore.put("Mission_Impossible.pdf", new File(""));
+                filesToStore.put("Turn_Up_The_Music.pdf", new File(""));
+                filesToStore.put("Super_Mario.pdf", new File(""));
+                filesToStore.put("American_Pickers.pdf", new File(""));
+                break;
+            case 3:
+                filesToStore.put("Microsoft_Office_2010.pdf", new File(""));
+                filesToStore.put("Happy_Feet.pdf", new File(""));
+                filesToStore.put("Modern_Family.pdf", new File(""));
+                filesToStore.put("American_Idol.pdf", new File(""));
+                filesToStore.put("Hacking_for_Dummies.pdf", new File(""));
+                break;
 
-        //generate 3 random indices to pick files from hashmap
-        int[] randomIndices = new Random().ints(1, films.size()).distinct().limit(3).toArray();
-
-        //pick files randomly
-        ArrayList<String> keysAsArray = new ArrayList<String>(films.keySet());
-        for (int fileIndex : randomIndices) {
-            filesToStore.put(keysAsArray.get(fileIndex), films.get(keysAsArray.get(fileIndex)));
-            log.info("File Added: " + keysAsArray.get(fileIndex));
         }
-
+        for (String key :
+                filesToStore.keySet()) {
+            log.info("Files Added: " + key);
+        }
     }
 
     public void initializeSocket(int port) { // initiating the listening for the port
@@ -340,7 +356,8 @@ public class Node implements Runnable{
                                 System.out.println("Request is forwareded!!!");
                             }
                         }
-                    } else if (command.equals("SEROK")) {
+                    }
+                } else if (command.equals("SEROK")) {
                         int totalResults = Integer.parseInt(st.nextToken());
                         String respondedNodeIP = st.nextToken();
                         int respondedNodePort = Integer.parseInt(st.nextToken());
@@ -390,7 +407,6 @@ public class Node implements Runnable{
                         }
 
                     }
-                }
             } catch (Exception e) {
                 System.out.println(e);
                 for (int i = 0; i < 3; i++) {
