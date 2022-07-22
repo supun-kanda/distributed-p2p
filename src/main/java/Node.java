@@ -278,117 +278,118 @@ public class Node implements Runnable{
                     int hops = Integer.parseInt(st.nextToken());
                     long initTimeStamp = Long.parseLong(st.nextToken());
                     System.out.println("SER " + originatorIP + " " + searchFile + " " + hops);
+                    if (originatorPort != getPort()) { //To ignore ser originating from own
 
-                    if (hops < 0) {
-                        String searchResultNotFoundCommand = " SEROK 0 " + ip_address + " " + nodePort + " "
-                                + (maxHops - hops);
-                        searchResultNotFoundCommand = "00" + (searchResultNotFoundCommand.length() + 4)
-                                + searchResultNotFoundCommand;
+                        if (hops < 0) {
+                            String searchResultNotFoundCommand = " SEROK 0 " + ip_address + " " + nodePort + " "
+                                    + (maxHops - hops);
+                            searchResultNotFoundCommand = "00" + (searchResultNotFoundCommand.length() + 4)
+                                    + searchResultNotFoundCommand;
 
-                        sendMessage(searchResultNotFoundCommand, originatorIP, String.valueOf(originatorPort));
+                            sendMessage(searchResultNotFoundCommand, originatorIP, String.valueOf(originatorPort));
 
-                    } else {
-                        int totalResults = 0;
-                        ArrayList<String> searchResults = new ArrayList<String>();
+                        } else {
+                            int totalResults = 0;
+                            ArrayList<String> searchResults = new ArrayList<String>();
 
-                        for (String fileNames : filesToStore.keySet()) {
-                            System.out.println(fileNames+" "+searchFile);
-                            if (fileNames.contains(searchFile)) {
-                                totalResults++;
-                                searchResults.add(fileNames);
-                            }
-                        }
-                        if(totalResults > 0) {
-                            log.info("File found in neighbor node in: " + (System.currentTimeMillis() - initTimeStamp) + " ms");
-                            --hops;
-                            String searchResultOkCommand = " SEROK " + totalResults + " " + ip_address + " " + nodePort
-                                    + " " + (maxHops - hops) + " " + initTimeStamp;
-                            for (String fileName : searchResults) {
-                                searchResultOkCommand += " " + fileName;
-                            }
-
-                            if (searchResultOkCommand.length() < 96) {
-                                searchResultOkCommand = "00" + (searchResultOkCommand.length() + 4)
-                                        + searchResultOkCommand;
-                            } else {
-                                searchResultOkCommand = "0" + (searchResultOkCommand.length() + 4)
-                                        + searchResultOkCommand;
-                            }
-                            sendMessage(searchResultOkCommand, originatorIP, String.valueOf(originatorPort));
-
-                        } else if (totalResults == 0) {
-                            //select random node from neighbours
-                            Random r = new Random();
-                            Neighbour randomSuccessor = null;
-
-                            while (true) {
-                                randomSuccessor = joinedNodes.get(r.nextInt(joinedNodes.size()));
-
-                                if (!(randomSuccessor.getIp().equals(incoming.getAddress().getHostAddress())
-                                        && randomSuccessor.getPort() == incoming.getPort())) {
-                                    break;
+                            for (String fileNames : filesToStore.keySet()) {
+                                System.out.println(fileNames + " " + searchFile);
+                                if (fileNames.contains(searchFile)) {
+                                    totalResults++;
+                                    searchResults.add(fileNames);
                                 }
                             }
-                            String searchCommand = " SER " + originatorIP + " " + originatorPort + " " + searchFile + " "
-                                    + --hops + " " + initTimeStamp;
+                            if (totalResults > 0) {
+                                log.info("File found in neighbor node in: " + (System.currentTimeMillis() - initTimeStamp) + " ms");
+                                --hops;
+                                String searchResultOkCommand = " SEROK " + totalResults + " " + ip_address + " " + nodePort
+                                        + " " + (maxHops - hops) + " " + initTimeStamp;
+                                for (String fileName : searchResults) {
+                                    searchResultOkCommand += " " + fileName;
+                                }
 
-                            searchCommand = "00" + (searchCommand.length() + 4) + searchCommand;
-                            sendMessage(searchCommand, randomSuccessor.getIp(),
-                                    String.valueOf(randomSuccessor.getPort()));
+                                if (searchResultOkCommand.length() < 96) {
+                                    searchResultOkCommand = "00" + (searchResultOkCommand.length() + 4)
+                                            + searchResultOkCommand;
+                                } else {
+                                    searchResultOkCommand = "0" + (searchResultOkCommand.length() + 4)
+                                            + searchResultOkCommand;
+                                }
+                                sendMessage(searchResultOkCommand, originatorIP, String.valueOf(originatorPort));
 
-                            System.out.println("Request is forwareded!!!");
+                            } else if (totalResults == 0) {
+                                //select random node from neighbours
+                                Random r = new Random();
+                                Neighbour randomSuccessor = null;
+
+                                while (true) {
+                                    randomSuccessor = joinedNodes.get(r.nextInt(joinedNodes.size()));
+
+                                    if (!(randomSuccessor.getIp().equals(incoming.getAddress().getHostAddress())
+                                            && randomSuccessor.getPort() == incoming.getPort())) {
+                                        break;
+                                    }
+                                }
+                                String searchCommand = " SER " + originatorIP + " " + originatorPort + " " + searchFile + " "
+                                        + --hops + " " + initTimeStamp;
+
+                                searchCommand = "00" + (searchCommand.length() + 4) + searchCommand;
+                                sendMessage(searchCommand, randomSuccessor.getIp(),
+                                        String.valueOf(randomSuccessor.getPort()));
+
+                                System.out.println("Request is forwareded!!!");
+                            }
                         }
-                    }
-                } else if (command.equals("SEROK")) {
-                    int totalResults = Integer.parseInt(st.nextToken());
-                    String respondedNodeIP = st.nextToken();
-                    int respondedNodePort = Integer.parseInt(st.nextToken());
-                    int hops = Integer.parseInt(st.nextToken());
+                    } else if (command.equals("SEROK")) {
+                        int totalResults = Integer.parseInt(st.nextToken());
+                        String respondedNodeIP = st.nextToken();
+                        int respondedNodePort = Integer.parseInt(st.nextToken());
+                        int hops = Integer.parseInt(st.nextToken());
 
-                    System.out.println("Responded Node IP: " + respondedNodeIP);
-                    System.out.println("Responded Node Port: " + respondedNodePort);
-                    System.out.println("Total No. of Results: " + totalResults);
-                    System.out.println("No of Hops request went through: " + hops);
-                    long searchTime = Long.parseLong(st.nextToken());
+                        System.out.println("Responded Node IP: " + respondedNodeIP);
+                        System.out.println("Responded Node Port: " + respondedNodePort);
+                        System.out.println("Total No. of Results: " + totalResults);
+                        System.out.println("No of Hops request went through: " + hops);
+                        long searchTime = Long.parseLong(st.nextToken());
 
-                    log.info("Total Search time: " + (System.currentTimeMillis() - searchTime) + " ms");
+                        log.info("Total Search time: " + (System.currentTimeMillis() - searchTime) + " ms");
 
-                    Client client = new Client(respondedNodeIP,
-                            respondedNodePort + OFFSET);
-                    for (int i = 0; i < totalResults; i++) {
+                        Client client = new Client(respondedNodeIP,
+                                respondedNodePort + OFFSET);
+                        for (int i = 0; i < totalResults; i++) {
 
-                        String matchingFile = st.nextToken();
-                        log.info("Following Matched File Will be downloaded from destination: " + client + " file: " + matchingFile);
-                        long diff = client.receiveFile(matchingFile);
-                        log.info("Total Time to download file : " + (System.currentTimeMillis() - searchTime + diff) + " ms");
-                    }
-
-
-
-                } else if (command.equals("REGOK")) {
-
-                    int no_nodes = Integer.parseInt(st.nextToken());
-
-                    System.out.println(" ### Send Join Request for Neighboring Nodes: " + no_nodes);
-
-                    while (no_nodes > 0 && no_nodes < 21) {
-
-                        String join_ip = st.nextToken();
-                        String join_port = st.nextToken();
-
-                        if (Integer.parseInt(join_port) != nodePort) {
-                            String join = " JOIN " + join_ip + " " + join_port;
-                            String join_msg = "00" + (join.length() + 4) + join;
-
-                            sendJoinReq(join_msg, join_ip, Integer.parseInt(join_port));
-                            Neighbour tempNeighbour = new Neighbour(join_ip, Integer.parseInt(join_port), "neighbour");
-                            joinedNodes.add(tempNeighbour);
-                            no_nodes -= 1;
+                            String matchingFile = st.nextToken();
+                            log.info("Following Matched File Will be downloaded from destination: " + client + " file: " + matchingFile);
+                            long diff = client.receiveFile(matchingFile);
+                            log.info("Total Time to download file : " + (System.currentTimeMillis() - searchTime + diff) + " ms");
                         }
 
-                        System.out.println("Number of Joined Nodes: " + joinedNodes.size());
-                    }
 
+                    } else if (command.equals("REGOK")) {
+
+                        int no_nodes = Integer.parseInt(st.nextToken());
+
+                        System.out.println(" ### Send Join Request for Neighboring Nodes: " + no_nodes);
+
+                        while (no_nodes > 0 && no_nodes < 21) {
+
+                            String join_ip = st.nextToken();
+                            String join_port = st.nextToken();
+
+                            if (Integer.parseInt(join_port) != nodePort) {
+                                String join = " JOIN " + join_ip + " " + join_port;
+                                String join_msg = "00" + (join.length() + 4) + join;
+
+                                sendJoinReq(join_msg, join_ip, Integer.parseInt(join_port));
+                                Neighbour tempNeighbour = new Neighbour(join_ip, Integer.parseInt(join_port), "neighbour");
+                                joinedNodes.add(tempNeighbour);
+                                no_nodes -= 1;
+                            }
+
+                            System.out.println("Number of Joined Nodes: " + joinedNodes.size());
+                        }
+
+                    }
                 }
             } catch (Exception e) {
                 System.out.println(e);
