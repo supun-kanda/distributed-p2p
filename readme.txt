@@ -1,21 +1,14 @@
-Change the directory to src/main/java folder
+Change the directory to repository root and run the following command
+sh build.sh
 
-javac  Neighbour.java  BootstrapServer.java
+Change the directory to src/main/java folder and start the BootstrapServer
 java BootstrapServer
 
-Change the directory to src/main/java folder
-
-javac Node.java Neighbour.java
+Change the directory to src/main/java folder and start a Node
 java Node
 
-Start the FTP server by changing the directory to src/main/java folder and then,
-javac FtpServer.java
-java Server
-
 search command using command line for the node
-
 ser <Search Query>
 
 example
-
 ser FAST
